@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography, Card, CardContent, Grid, Avatar, Chip, Divider, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Box, Typography, Card, Avatar, Chip, Divider, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter, useParams } from 'next/navigation';
 import { getClientById, getStatusColor } from '@/utils/fake-data';
@@ -90,8 +90,17 @@ export default function ClientDetailPage() {
 
         <Divider sx={{ my: 3, borderColor: '#f5f5f7' }} />
 
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={6}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              md: 'repeat(2, 1fr)',
+            },
+            gap: 4,
+          }}
+        >
+          <Box>
             <Typography sx={{ color: '#86868b', fontSize: '0.8125rem', mb: 1, fontWeight: 500 }}>
               Email
             </Typography>
@@ -105,8 +114,8 @@ export default function ClientDetailPage() {
             <Typography sx={{ color: '#1d1d1f', fontSize: '0.9375rem', mb: 3 }}>
               {clientDetail.phone}
             </Typography>
-          </Grid>
-          <Grid item xs={12} md={6}>
+          </Box>
+          <Box>
             <Typography sx={{ color: '#86868b', fontSize: '0.8125rem', mb: 1, fontWeight: 500 }}>
               Address
             </Typography>
@@ -120,91 +129,97 @@ export default function ClientDetailPage() {
             <Typography sx={{ color: '#1d1d1f', fontSize: '0.9375rem' }}>
               {clientDetail.lastOrder ? new Date(clientDetail.lastOrder).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}
             </Typography>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Card>
 
-      {/* Estadísticas */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={4}>
-          <Card
+      {/* Statistics */}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(3, 1fr)',
+          },
+          gap: 3,
+          mb: 4,
+        }}
+      >
+        <Card
+          sx={{
+            bgcolor: '#ffffff',
+            borderRadius: '16px',
+            boxShadow: 'none',
+            border: '1px solid #f5f5f7',
+            p: 3,
+          }}
+        >
+          <Typography sx={{ color: '#86868b', fontSize: '0.8125rem', mb: 1.5, fontWeight: 400 }}>
+            Total Orders
+          </Typography>
+          <Typography
+            variant="h3"
             sx={{
-              bgcolor: '#ffffff',
-              borderRadius: '16px',
-              boxShadow: 'none',
-              border: '1px solid #f5f5f7',
-              p: 3,
+              fontWeight: 300,
+              color: '#1d1d1f',
+              fontSize: '2rem',
+              letterSpacing: '-0.5px',
             }}
           >
-            <Typography sx={{ color: '#86868b', fontSize: '0.8125rem', mb: 1.5, fontWeight: 400 }}>
-              Total Orders
-            </Typography>
-            <Typography
-              variant="h3"
-              sx={{
-                fontWeight: 300,
-                color: '#1d1d1f',
-                fontSize: '2rem',
-                letterSpacing: '-0.5px',
-              }}
-            >
-              {clientDetail.totalOrders}
-            </Typography>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Card
+            {clientDetail.totalOrders}
+          </Typography>
+        </Card>
+
+        <Card
+          sx={{
+            bgcolor: '#ffffff',
+            borderRadius: '16px',
+            boxShadow: 'none',
+            border: '1px solid #f5f5f7',
+            p: 3,
+          }}
+        >
+          <Typography sx={{ color: '#86868b', fontSize: '0.8125rem', mb: 1.5, fontWeight: 400 }}>
+            Total Spent
+          </Typography>
+          <Typography
+            variant="h3"
             sx={{
-              bgcolor: '#ffffff',
-              borderRadius: '16px',
-              boxShadow: 'none',
-              border: '1px solid #f5f5f7',
-              p: 3,
+              fontWeight: 300,
+              color: '#66bb6a',
+              fontSize: '2rem',
+              letterSpacing: '-0.5px',
             }}
           >
-            <Typography sx={{ color: '#86868b', fontSize: '0.8125rem', mb: 1.5, fontWeight: 400 }}>
-              Total Spent
-            </Typography>
-            <Typography
-              variant="h3"
-              sx={{
-                fontWeight: 300,
-                color: '#66bb6a',
-                fontSize: '2rem',
-                letterSpacing: '-0.5px',
-              }}
-            >
-              ${clientDetail.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-            </Typography>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Card
+            ${clientDetail.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          </Typography>
+        </Card>
+
+        <Card
+          sx={{
+            bgcolor: '#ffffff',
+            borderRadius: '16px',
+            boxShadow: 'none',
+            border: '1px solid #f5f5f7',
+            p: 3,
+          }}
+        >
+          <Typography sx={{ color: '#86868b', fontSize: '0.8125rem', mb: 1.5, fontWeight: 400 }}>
+            Average Order Value
+          </Typography>
+          <Typography
+            variant="h3"
             sx={{
-              bgcolor: '#ffffff',
-              borderRadius: '16px',
-              boxShadow: 'none',
-              border: '1px solid #f5f5f7',
-              p: 3,
+              fontWeight: 300,
+              color: '#1d1d1f',
+              fontSize: '2rem',
+              letterSpacing: '-0.5px',
             }}
           >
-            <Typography sx={{ color: '#86868b', fontSize: '0.8125rem', mb: 1.5, fontWeight: 400 }}>
-              Average Order Value
-            </Typography>
-            <Typography
-              variant="h3"
-              sx={{
-                fontWeight: 300,
-                color: '#1d1d1f',
-                fontSize: '2rem',
-                letterSpacing: '-0.5px',
-              }}
-            >
-              ${(clientDetail.totalSpent / clientDetail.totalOrders).toLocaleString('en-US', { minimumFractionDigits: 2 })}
-            </Typography>
-          </Card>
-        </Grid>
-      </Grid>
+            ${(clientDetail.totalSpent / clientDetail.totalOrders).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          </Typography>
+        </Card>
+      </Box>
 
       {/* Order History */}
       <Card
