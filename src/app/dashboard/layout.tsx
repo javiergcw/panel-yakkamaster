@@ -1,17 +1,22 @@
 'use client';
 
 import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, AppBar, Toolbar, IconButton, Avatar } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
+import GroupIcon from '@mui/icons-material/Group';
+import BusinessIcon from '@mui/icons-material/Business';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { usePathname, useRouter } from 'next/navigation';
+import { getUser, clearSession } from '@/modules/auth';
 
 const drawerWidth = 280;
 
 const menuItems = [
   { text: 'Dashboard', icon: DashboardIcon, path: '/dashboard' },
+  { text: 'Users', icon: GroupIcon, path: '/dashboard/users' },
+  { text: 'Organization', icon: BusinessIcon, path: '/dashboard/organization' },
   { text: 'Clients', icon: PeopleIcon, path: '/dashboard/client' },
 ];
 
@@ -21,11 +26,22 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [user, setUserState] = useState<ReturnType<typeof getUser>>(null);
   const pathname = usePathname();
   const router = useRouter();
 
+  useEffect(() => {
+    setUserState(getUser());
+  }, []);
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleSignOut = () => {
+    clearSession();
+    router.push('/');
+    router.refresh();
   };
 
   const drawer = (
@@ -91,33 +107,43 @@ export default function DashboardLayout({
       {/* User Section */}
       <Box sx={{ p: 2, borderTop: '1px solid #f5f5f7' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, px: 1 }}>
-          <Avatar sx={{ width: 36, height: 36, bgcolor: '#66bb6a', mr: 1.5 }}>
-            U
+          <Avatar
+            src={user?.photo ?? undefined}
+            sx={{ width: 36, height: 36, bgcolor: '#66bb6a', mr: 1.5 }}
+          >
+            {user ? (user.first_name?.[0] ?? user.email?.[0] ?? 'U').toUpperCase() : 'U'}
           </Avatar>
-          <Box sx={{ flex: 1 }}>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography
               variant="body2"
               sx={{
                 fontWeight: 500,
                 color: '#1d1d1f',
                 fontSize: '0.875rem',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
             >
-              User
+              {user ? [user.first_name, user.last_name].filter(Boolean).join(' ') || user.email : 'User'}
             </Typography>
             <Typography
               variant="caption"
               sx={{
                 color: '#86868b',
                 fontSize: '0.75rem',
+                display: 'block',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
             >
-              user@example.com
+              {user?.email ?? 'user@example.com'}
             </Typography>
           </Box>
         </Box>
         <ListItemButton
-          onClick={() => router.push('/')}
+          onClick={handleSignOut}
           sx={{
             borderRadius: '12px',
             py: 1.5,

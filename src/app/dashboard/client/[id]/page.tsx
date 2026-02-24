@@ -2,17 +2,42 @@
 
 import { Box, Typography, Card, Avatar, Chip, Divider, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { getClientById, getStatusColor } from '@/utils/fake-data';
+import { GetClientByIdUseCase, ClientRepositoryEmpty, getStatusColor, type Client } from '@/modules/client';
+
+const getClientByIdUseCase = new GetClientByIdUseCase(new ClientRepositoryEmpty());
 
 export default function ClientDetailPage() {
   const router = useRouter();
   const params = useParams();
   const clientId = params?.id ? Number(params.id) : null;
-  
-  const clientDetail = clientId ? getClientById(clientId) : null;
+  const [clientDetail, setClientDetail] = useState<Client | null | undefined>(undefined);
 
-  if (!clientDetail) {
+  useEffect(() => {
+    if (!clientId) {
+      setClientDetail(undefined);
+      return;
+    }
+    setClientDetail(undefined);
+    getClientByIdUseCase.execute(clientId).then(setClientDetail);
+  }, [clientId]);
+
+  if (clientId == null) {
+    return (
+      <Box>
+        <Typography>Invalid client ID</Typography>
+      </Box>
+    );
+  }
+  if (clientDetail === undefined) {
+    return (
+      <Box>
+        <Typography>Loading...</Typography>
+      </Box>
+    );
+  }
+  if (clientDetail === null) {
     return (
       <Box>
         <Typography>Client not found</Typography>

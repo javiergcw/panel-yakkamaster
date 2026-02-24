@@ -1,12 +1,65 @@
 'use client';
 
-import { Box, Typography, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Avatar, Chip, IconButton, TextField, InputAdornment } from '@mui/material';
+import { useEffect, useState } from 'react';
+import {
+  Box,
+  Typography,
+  Card,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Avatar,
+  Chip,
+  TextField,
+  InputAdornment,
+  CircularProgress,
+} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useRouter } from 'next/navigation';
-import { clients, getStatusColor } from '@/utils/fake-data';
+import { GetClientsUseCase, ClientRepositoryEmpty, getStatusColor, type Client } from '@/modules/client';
+import { FetchErrorState } from '@/components/FetchErrorState';
+
+const getClientsUseCase = new GetClientsUseCase(new ClientRepositoryEmpty());
 
 export default function ClientsPage() {
   const router = useRouter();
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadClients = () => {
+    setError(null);
+    setLoading(true);
+    getClientsUseCase
+      .execute()
+      .then(setClients)
+      .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load clients'))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadClients();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 320 }}>
+        <CircularProgress sx={{ color: '#66bb6a' }} />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <FetchErrorState
+        message={error}
+        onRetry={loadClients}
+      />
+    );
+  }
 
   return (
     <Box>
