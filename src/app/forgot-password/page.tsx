@@ -304,20 +304,34 @@ export default function ForgotPasswordPage() {
         </Container>
       </Box>
 
-      {/* Right Side - Green Panel (hidden on small screens) */}
+      {/* Right Side - Banner image (hidden on small screens) */}
       <Box
         sx={{
           flex: 1,
-          bgcolor: '#66bb6a',
+          backgroundImage: 'url(/Login_banner.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
           display: { xs: 'none', lg: 'flex' },
           alignItems: 'center',
           justifyContent: 'center',
           position: 'relative',
           minHeight: { xs: 'auto', lg: '100vh' },
+          overflow: 'hidden',
         }}
       >
+        {/* Overlay oscuro para contraste del texto */}
         <Box
           sx={{
+            position: 'absolute',
+            inset: 0,
+            bgcolor: 'rgba(0, 0, 0, 0.45)',
+            zIndex: 0,
+          }}
+        />
+        <Box
+          sx={{
+            position: 'relative',
+            zIndex: 1,
             textAlign: 'center',
             color: 'white',
             p: 4,

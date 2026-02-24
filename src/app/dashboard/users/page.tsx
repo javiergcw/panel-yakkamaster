@@ -257,9 +257,6 @@ export default function UsersPage() {
                           <Typography sx={{ fontWeight: 500, color: '#1d1d1f', fontSize: '0.9375rem' }}>
                             {displayName(user)}
                           </Typography>
-                          <Typography sx={{ color: '#86868b', fontSize: '0.8125rem' }}>
-                            ID: {user.id.slice(0, 8)}…
-                          </Typography>
                         </Box>
                       </Box>
                     </TableCell>
@@ -342,9 +339,6 @@ export default function UsersPage() {
                         <Box>
                           <Typography sx={{ fontWeight: 500, color: '#1d1d1f', fontSize: '0.9375rem' }}>
                             {displayName(user)}
-                          </Typography>
-                          <Typography sx={{ color: '#86868b', fontSize: '0.8125rem' }}>
-                            ID: {user.id.slice(0, 8)}…
                           </Typography>
                         </Box>
                       </Box>
