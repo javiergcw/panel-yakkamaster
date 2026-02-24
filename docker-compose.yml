@@ -1,0 +1,6 @@
+services:
+  panel-yakkamaster:
+    build: .
+    ports:
+      - "7001:7001"
+    restart: unless-stopped
