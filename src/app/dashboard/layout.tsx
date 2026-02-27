@@ -6,6 +6,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
 import GroupIcon from '@mui/icons-material/Group';
 import BusinessIcon from '@mui/icons-material/Business';
+import WorkIcon from '@mui/icons-material/Work';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { usePathname, useRouter } from 'next/navigation';
@@ -18,6 +19,7 @@ const menuItems = [
   { text: 'Users', icon: GroupIcon, path: '/dashboard/users' },
   { text: 'Organization', icon: BusinessIcon, path: '/dashboard/organization' },
   { text: 'Clients', icon: PeopleIcon, path: '/dashboard/client' },
+  { text: 'Jobs', icon: WorkIcon, path: '/dashboard/jobs' },
 ];
 
 export default function DashboardLayout({

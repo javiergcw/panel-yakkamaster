@@ -7,3 +7,4 @@ export { GetOrganizationUseCase } from './GetOrganizationUseCase';
 export { UpdateOrganizationUseCase } from './UpdateOrganizationUseCase';
 export { UpdateLabourVerificationUseCase } from './UpdateLabourVerificationUseCase';
 export { UpdateBuilderVerificationUseCase } from './UpdateBuilderVerificationUseCase';
+export { GetJobsUseCase } from './GetJobsUseCase';

@@ -21,3 +21,9 @@ export type {
   UpdateVerificationResponse,
   OrganizationDetailResponse,
 } from './InstitutionDetail';
+export type {
+  Job,
+  JobLicense,
+  JobSkill,
+  JobsResponse,
+} from './InstitutionJobs';
