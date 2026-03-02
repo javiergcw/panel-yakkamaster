@@ -3,29 +3,23 @@
 import React from 'react';
 import { Box, Typography, Button, TextField } from '@mui/material';
 import StepFooter from './StepFooter';
+import { FetchErrorState } from '@/components/FetchErrorState';
+import type { JobRequirement, License } from '@/modules/masters';
 
 const GREEN = '#66bb6a';
-
-const JOB_REQUIREMENTS = [
-  'White Card',
-  'Heavy Lifting',
-  'Apprenticeship',
-  'Must have experience',
-  'Women Only',
-  'Good English Level',
-  'ABN Payment',
-  'RSA',
-  'PWD Opportunity',
-  'Full PPE',
-];
 
 interface Step7JobDetailsProps {
   onBack: () => void;
   onNext: () => void;
+  requirements: JobRequirement[];
+  licensesList: License[];
+  loading: boolean;
+  error: string | null;
+  onRetry: () => void;
   jobRequirements: string[];
   setJobRequirements: (value: string[] | ((prev: string[]) => string[])) => void;
-  licensesText: string;
-  setLicensesText: (value: string) => void;
+  licenses: string[];
+  setLicenses: (value: string[] | ((prev: string[]) => string[])) => void;
   description: string;
   setDescription: (value: string) => void;
 }
@@ -33,18 +27,43 @@ interface Step7JobDetailsProps {
 export default function Step7JobDetails({
   onBack,
   onNext,
+  requirements,
+  licensesList,
+  loading,
+  error,
+  onRetry,
   jobRequirements,
   setJobRequirements,
-  licensesText,
-  setLicensesText,
+  licenses: selectedLicenses,
+  setLicenses,
   description,
   setDescription,
 }: Step7JobDetailsProps) {
-  const toggleRequirement = (label: string) => {
+  const activeRequirements = requirements.filter((r) => r.is_active);
+  const activeLicenses = licensesList.filter((l) => l.active);
+
+  const toggleRequirement = (id: string) => {
     setJobRequirements((prev) =>
-      prev.includes(label) ? prev.filter((r) => r !== label) : [...prev, label]
+      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
     );
   };
+
+  const toggleLicense = (id: string) => {
+    setLicenses((prev) =>
+      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
+    );
+  };
+
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', flexGrow: 1 }}>
+        <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2 }}>
+          <FetchErrorState message={error} onRetry={onRetry} />
+        </Box>
+        <StepFooter onBack={onBack} onNext={onNext} nextDisabled={true} progressPercent={100} />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', flexGrow: 1 }}>
@@ -87,70 +106,99 @@ export default function Step7JobDetails({
           >
             Job Requirements
           </Typography>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr 1fr', sm: 'repeat(2, 1fr)' },
-              gap: 1.5,
-              mb: 3,
-            }}
-          >
-            {JOB_REQUIREMENTS.map((label) => {
-              const selected = jobRequirements.includes(label);
-              return (
-                <Button
-                  key={label}
-                  variant="outlined"
-                  onClick={() => toggleRequirement(label)}
-                  sx={{
-                    textTransform: 'none',
-                    fontWeight: 500,
-                    fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                    borderRadius: '12px',
-                    borderColor: selected ? GREEN : '#e0e0e0',
-                    color: selected ? '#fff' : '#1d1d1f',
-                    bgcolor: selected ? GREEN : 'transparent',
-                    py: 1.25,
-                    '&:hover': {
-                      borderColor: selected ? GREEN : '#d0d0d0',
-                      bgcolor: selected ? '#5cb860' : '#f5f5f7',
-                    },
-                  }}
-                >
-                  {label}
-                </Button>
-              );
-            })}
-          </Box>
+          {loading ? (
+            <Typography sx={{ color: '#86868b', fontSize: '0.875rem', mb: 3 }}>
+              Loading requirements...
+            </Typography>
+          ) : (
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr 1fr', sm: 'repeat(2, 1fr)' },
+                gap: 1.5,
+                mb: 3,
+              }}
+            >
+              {activeRequirements.map((req) => {
+                const selected = jobRequirements.includes(req.id);
+                return (
+                  <Button
+                    key={req.id}
+                    variant="outlined"
+                    onClick={() => toggleRequirement(req.id)}
+                    sx={{
+                      textTransform: 'none',
+                      fontWeight: 500,
+                      fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                      borderRadius: '12px',
+                      borderColor: selected ? GREEN : '#e0e0e0',
+                      color: selected ? '#fff' : '#1d1d1f',
+                      bgcolor: selected ? GREEN : 'transparent',
+                      py: 1.25,
+                      '&:hover': {
+                        borderColor: selected ? GREEN : '#d0d0d0',
+                        bgcolor: selected ? '#5cb860' : '#f5f5f7',
+                      },
+                    }}
+                  >
+                    {req.name}
+                  </Button>
+                );
+              })}
+            </Box>
+          )}
 
           <Typography
             sx={{
-              color: '#86868b',
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              mb: 1,
+              fontWeight: 700,
+              color: '#1d1d1f',
+              fontSize: { xs: '1rem', sm: '1.0625rem' },
+              mb: 2,
             }}
           >
-            List any required licenses, tickets, or insurances
+            Licenses, tickets, or insurances
           </Typography>
-          <TextField
-            fullWidth
-            placeholder="Add tickets/license or other"
-            value={licensesText}
-            onChange={(e) => setLicensesText(e.target.value)}
-            variant="outlined"
-            size="small"
-            sx={{
-              mb: 4,
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '12px',
-                bgcolor: '#ffffff',
-                '& fieldset': { borderColor: '#e5e5ea' },
-                '&:hover fieldset': { borderColor: '#d1d1d6' },
-                '&.Mui-focused fieldset': { borderColor: GREEN, borderWidth: 2 },
-              },
-            }}
-          />
+          {loading ? (
+            <Typography sx={{ color: '#86868b', fontSize: '0.875rem', mb: 3 }}>
+              Loading licenses...
+            </Typography>
+          ) : (
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr 1fr', sm: 'repeat(2, 1fr)' },
+                gap: 1.5,
+                mb: 4,
+              }}
+            >
+              {activeLicenses.map((lic) => {
+                const selected = selectedLicenses.includes(lic.id);
+                return (
+                  <Button
+                    key={lic.id}
+                    variant="outlined"
+                    onClick={() => toggleLicense(lic.id)}
+                    sx={{
+                      textTransform: 'none',
+                      fontWeight: 500,
+                      fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                      borderRadius: '12px',
+                      borderColor: selected ? GREEN : '#e0e0e0',
+                      color: selected ? '#fff' : '#1d1d1f',
+                      bgcolor: selected ? GREEN : 'transparent',
+                      py: 1.25,
+                      '&:hover': {
+                        borderColor: selected ? GREEN : '#d0d0d0',
+                        bgcolor: selected ? '#5cb860' : '#f5f5f7',
+                      },
+                    }}
+                  >
+                    {lic.name}
+                  </Button>
+                );
+              })}
+            </Box>
+          )}
 
           {/* Description */}
           <Typography

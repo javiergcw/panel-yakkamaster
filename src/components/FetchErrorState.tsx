@@ -63,7 +63,7 @@ export function FetchErrorState({ message, onRetry, title = 'Something went wron
           '&:hover': { bgcolor: '#5cb860' },
         }}
       >
-        Recargar
+        Reload
       </Button>
     </Box>
   );

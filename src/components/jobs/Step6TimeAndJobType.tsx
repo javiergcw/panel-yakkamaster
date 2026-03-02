@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, CircularProgress } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import StepFooter from './StepFooter';
+import { FetchErrorState } from '@/components/FetchErrorState';
+import type { JobType } from '@/modules/masters';
 
 const GREEN = '#66bb6a';
 
@@ -74,19 +76,11 @@ const popperPaperSx = {
   '& .MuiClockPointer-noPoint': { bgcolor: GREEN },
 };
 
-const JOB_TYPES = [
-  'Casual Job',
-  'Part time',
-  'Full time',
-  'Farms Job',
-  'Mining Job',
-  'FIFO',
-  'Seasonal job',
-  'W&H visa',
-  'Other',
-];
-
-interface Step6TimeAndJobTypeProps {
+export interface Step6TimeAndJobTypeProps {
+  jobTypes: JobType[];
+  loading: boolean;
+  error: string | null;
+  onRetry: () => void;
   onBack: () => void;
   onNext: () => void;
   startTime: Date | null;
@@ -98,6 +92,10 @@ interface Step6TimeAndJobTypeProps {
 }
 
 export default function Step6TimeAndJobType({
+  jobTypes,
+  loading,
+  error,
+  onRetry,
   onBack,
   onNext,
   startTime,
@@ -107,6 +105,16 @@ export default function Step6TimeAndJobType({
   jobType,
   setJobType,
 }: Step6TimeAndJobTypeProps) {
+  const activeTypes = [...jobTypes]
+    .filter((t) => t.is_active)
+    .sort((a, b) => {
+      const descA = a.description ?? '';
+      const descB = b.description ?? '';
+      const numA = Number(descA);
+      const numB = Number(descB);
+      if (!Number.isNaN(numA) && !Number.isNaN(numB)) return numA - numB;
+      return descA.localeCompare(descB);
+    });
   const nextDisabled = !startTime || !endTime || !jobType;
   const [openStart, setOpenStart] = useState(false);
   const [openEnd, setOpenEnd] = useState(false);
@@ -214,45 +222,59 @@ export default function Step6TimeAndJobType({
             What kind of job are you offering?
           </Typography>
 
-          <Box
-            sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: { xs: 1, sm: 1.5 },
-              width: '100%',
-              maxWidth: 720,
-              justifyContent: 'center',
-            }}
-          >
-            {JOB_TYPES.map((label) => {
-              const selected = jobType === label;
-              return (
-                <Button
-                  key={label}
-                  variant={selected ? 'contained' : 'outlined'}
-                  onClick={() => setJobType(selected ? null : label)}
-                  sx={{
-                    textTransform: 'none',
-                    fontWeight: 500,
-                    fontSize: { xs: '0.8125rem', sm: '0.9rem' },
-                    borderRadius: '12px',
-                    borderColor: '#e0e0e0',
-                    color: selected ? '#fff' : '#1d1d1f',
-                    bgcolor: selected ? GREEN : 'transparent',
-                    px: { xs: 1.5, sm: 2 },
-                    py: { xs: 0.75, sm: 1 },
-                    minWidth: 0,
-                    '&:hover': {
-                      borderColor: selected ? GREEN : '#d0d0d0',
-                      bgcolor: selected ? '#5cb860' : '#f5f5f7',
-                    },
-                  }}
-                >
-                  {label}
-                </Button>
-              );
-            })}
-          </Box>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress sx={{ color: GREEN }} />
+            </Box>
+          ) : error ? (
+            <FetchErrorState message={error} onRetry={onRetry} />
+          ) : (
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: { xs: 1, sm: 1.5 },
+                width: '100%',
+                maxWidth: 720,
+                justifyContent: 'center',
+              }}
+            >
+              {activeTypes.length === 0 ? (
+                <Typography sx={{ color: '#86868b', fontSize: '0.9375rem' }}>
+                  No job types available.
+                </Typography>
+              ) : (
+                activeTypes.map((t) => {
+                  const selected = jobType === t.id;
+                  return (
+                    <Button
+                      key={t.id}
+                      variant={selected ? 'contained' : 'outlined'}
+                      onClick={() => setJobType(selected ? null : t.id)}
+                      sx={{
+                        textTransform: 'none',
+                        fontWeight: 500,
+                        fontSize: { xs: '0.8125rem', sm: '0.9rem' },
+                        borderRadius: '12px',
+                        borderColor: '#e0e0e0',
+                        color: selected ? '#fff' : '#1d1d1f',
+                        bgcolor: selected ? GREEN : 'transparent',
+                        px: { xs: 1.5, sm: 2 },
+                        py: { xs: 0.75, sm: 1 },
+                        minWidth: 0,
+                        '&:hover': {
+                          borderColor: selected ? GREEN : '#d0d0d0',
+                          bgcolor: selected ? '#5cb860' : '#f5f5f7',
+                        },
+                      }}
+                    >
+                      {t.name}
+                    </Button>
+                  );
+                })
+              )}
+            </Box>
+          )}
         </Box>
 
         <StepFooter

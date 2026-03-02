@@ -116,6 +116,9 @@ export interface Step9JobSummaryProps {
   onEditTime: () => void;
   onEditPayment: () => void;
   onEditDescription: () => void;
+  submitLoading?: boolean;
+  submitError?: string | null;
+  submitLabel?: string;
 }
 
 export default function Step9JobSummary({
@@ -138,7 +141,12 @@ export default function Step9JobSummary({
   onEditTime,
   onEditPayment,
   onEditDescription,
+  submitLoading = false,
+  submitError = null,
+  submitLabel,
 }: Step9JobSummaryProps) {
+  const nextLabel = submitLabel ?? 'Post job';
+  const nextLoadingLabel = submitLabel === 'Update job' ? 'Updating...' : 'Posting...';
   const datesText =
     startDate && endDate
       ? `${formatDate(startDate)} - ${formatDate(endDate)}`
@@ -282,14 +290,19 @@ export default function Step9JobSummary({
             />
           </Box>
         </Paper>
+        {submitError && (
+          <Typography sx={{ color: 'error.main', fontSize: '0.875rem', mt: 2, textAlign: 'center' }}>
+            {submitError}
+          </Typography>
+        )}
       </Box>
 
       <StepFooter
         onBack={onBack}
         onNext={onNext}
-        nextDisabled={false}
+        nextDisabled={submitLoading}
         progressPercent={100}
-        nextText="Post job"
+        nextText={submitLoading ? nextLoadingLabel : nextLabel}
       />
     </Box>
   );

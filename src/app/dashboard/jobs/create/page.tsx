@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Box,
@@ -17,7 +17,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 // Import Subcomponents
 import Step1Jobsites from "@/components/jobs/Step1Jobsites";
-import Step2Skills from "@/components/jobs/Step2Skills";
+import Step2Skills, { skillDisplayLabel } from "@/components/jobs/Step2Skills";
 import Step3Workers from "@/components/jobs/Step3Workers";
 import Step4LabourCosts from "@/components/jobs/Step4LabourCosts";
 import Step5Dates from "@/components/jobs/Step5Dates";
@@ -27,105 +27,154 @@ import Step8PaymentSchedule from "@/components/jobs/Step8PaymentSchedule";
 import type { PaymentScheduleType } from "@/components/jobs/Step8PaymentSchedule";
 import Step9JobSummary from "@/components/jobs/Step9JobSummary";
 import CreateJobsiteModal from "@/components/jobs/CreateJobsiteModal";
+import {
+  GetJobsitesUseCase,
+  InstitutionDashboardService,
+  type JobsitesResponse,
+} from "@/modules/institution";
+import {
+  CreateJobUseCase,
+  JobsService,
+  type CreateJobRequest,
+} from "@/modules/jobs";
+import {
+  GetJobRequirementsUseCase,
+  GetJobTypesUseCase,
+  GetLicensesUseCase,
+  GetSkillsUseCase,
+  JobRequirementsService,
+  JobTypesService,
+  LicensesService,
+  SkillsService,
+  type JobRequirementsResponse,
+  type JobTypesResponse,
+  type LicensesResponse,
+  type SkillsResponse,
+} from "@/modules/masters";
+import { FetchErrorState } from "@/components/FetchErrorState";
 
-// Mock data for jobsites
-const MOCK_JOBSITES = [{ id: "1", name: "333 DDDD", location: "Sydney" }];
-
-const MOCK_SKILLS = [
-  "General Labourer",
-  "Carpenter",
-  "Electrician",
-  "Plumber",
-  "Bricklayer",
-  "Concreter",
-  "Painter",
-  "Excavator Operator",
-  "Truck Driver",
-  "Forklift Driver",
-  "Paver Operator",
-  "Truck LR Driver",
-  "Asbestos Remover",
-  "Elevator operator",
-  "Foreman",
-  "Tow Truck Driver",
-  "Lawn mower",
-  "Construction Foreman",
-  "Bulldozer Operator",
-  "Heavy Rigid Truck Driver",
-  "Traffic Controller",
-  "Bartender",
-  "Gardener",
-  "Truck HC Driver",
-  "Waitress / Waiter",
-  "Crane Operator - Mobile",
-  "Project Manager",
-  "Light Truck Driver",
-  "Receptionist",
-  "Warehouse Labourer",
-  "Roofer",
-  "Formworker",
-  "Dogman",
-  "Concrete Truck Driver",
-  "Safety Officer",
-  "Welder",
-  "Truck MR Driver",
-  "Pipelayer",
-  "Surveyor",
-  "Drill Operator",
-  "Tiler",
-  "Chef",
-  "Compactor Operator",
-  "Building Inspector",
-  "Event Manager",
-  "Short-Haul Truck Driver",
-  "Boiler maker",
-  "Tipper Truck Driver",
-  "Kitchen Hand",
-  "Floor Layer",
-  "Barista",
-  "HVAC Technician",
-  "Civil Engineer",
-  "Scaffolder",
-  "Glazier",
-  "Earthmoving",
-  "Loader Operator",
-  "Crane Operator",
-  "Steel Fixer",
-  "Other",
-  "Truck HR Driver",
-  "Fencer",
-  "Fuel Truck Driver",
-  "Alimak Operator",
-  "Demolition Worker",
-  "Forklift High Reach",
-  "Removalist",
-  "EWP Operator",
-  "Backhoe Operator",
-  "Site Supervisor",
-  "Dump Truck Driver",
-  "Runner",
-  "Crane Operator - Tower",
-  "Boom Lift Operator",
-  "Scraper Operator",
-  "Waterproofer",
-  "Rigger",
-  "Cleaner",
-  "Handyperson",
-  "testing-ux",
-  "Event Staff",
-  "Landscaper",
-  "Excavator Spotter",
-  "Long-Haul Truck Driver",
-  "Plasterer",
-  "Scissor Lift Operator",
-  "Grader Operator",
-];
+const institutionService = new InstitutionDashboardService();
+const getJobsitesUseCase = new GetJobsitesUseCase(institutionService);
+const skillsService = new SkillsService();
+const getSkillsUseCase = new GetSkillsUseCase(skillsService);
+const jobTypesService = new JobTypesService();
+const getJobTypesUseCase = new GetJobTypesUseCase(jobTypesService);
+const jobRequirementsService = new JobRequirementsService();
+const getJobRequirementsUseCase = new GetJobRequirementsUseCase(jobRequirementsService);
+const licensesService = new LicensesService();
+const getLicensesUseCase = new GetLicensesUseCase(licensesService);
+const jobsService = new JobsService();
+const createJobUseCase = new CreateJobUseCase(jobsService);
 
 export default function CreateJobPage() {
   const router = useRouter();
   const [activeStep, setActiveStep] = useState(0); // 0: Jobsites, 1: Skills
   const [selectedJobsite, setSelectedJobsite] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [jobsitesData, setJobsitesData] = useState<JobsitesResponse | null>(null);
+  const [jobsitesLoading, setJobsitesLoading] = useState(true);
+  const [jobsitesError, setJobsitesError] = useState<string | null>(null);
+
+  const loadJobsites = useCallback(() => {
+    setJobsitesError(null);
+    setJobsitesLoading(true);
+    getJobsitesUseCase
+      .execute()
+      .then(setJobsitesData)
+      .catch((err) =>
+        setJobsitesError(err instanceof Error ? err.message : "Failed to load jobsites")
+      )
+      .finally(() => setJobsitesLoading(false));
+  }, []);
+
+  const [skillsData, setSkillsData] = useState<SkillsResponse | null>(null);
+  const [skillsLoading, setSkillsLoading] = useState(false);
+  const [skillsError, setSkillsError] = useState<string | null>(null);
+
+  const loadSkills = useCallback(() => {
+    setSkillsError(null);
+    setSkillsLoading(true);
+    getSkillsUseCase
+      .execute()
+      .then(setSkillsData)
+      .catch((err) =>
+        setSkillsError(err instanceof Error ? err.message : "Failed to load skills")
+      )
+      .finally(() => setSkillsLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (activeStep === 0) {
+      loadJobsites();
+    }
+  }, [activeStep, loadJobsites]);
+
+  useEffect(() => {
+    if (activeStep === 1) {
+      loadSkills();
+    }
+  }, [activeStep, loadSkills]);
+
+  const [jobTypesData, setJobTypesData] = useState<JobTypesResponse | null>(null);
+  const [jobTypesLoading, setJobTypesLoading] = useState(false);
+  const [jobTypesError, setJobTypesError] = useState<string | null>(null);
+
+  const loadJobTypes = useCallback(() => {
+    setJobTypesError(null);
+    setJobTypesLoading(true);
+    getJobTypesUseCase
+      .execute()
+      .then(setJobTypesData)
+      .catch((err) =>
+        setJobTypesError(err instanceof Error ? err.message : "Failed to load job types")
+      )
+      .finally(() => setJobTypesLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (activeStep === 5) {
+      loadJobTypes();
+    }
+  }, [activeStep, loadJobTypes]);
+
+  const [jobRequirementsData, setJobRequirementsData] = useState<JobRequirementsResponse | null>(null);
+  const [jobRequirementsLoading, setJobRequirementsLoading] = useState(false);
+  const [jobRequirementsError, setJobRequirementsError] = useState<string | null>(null);
+
+  const loadJobRequirements = useCallback(() => {
+    setJobRequirementsError(null);
+    setJobRequirementsLoading(true);
+    getJobRequirementsUseCase
+      .execute()
+      .then(setJobRequirementsData)
+      .catch((err) =>
+        setJobRequirementsError(err instanceof Error ? err.message : "Failed to load job requirements")
+      )
+      .finally(() => setJobRequirementsLoading(false));
+  }, []);
+
+  const [licensesData, setLicensesData] = useState<LicensesResponse | null>(null);
+  const [licensesLoading, setLicensesLoading] = useState(false);
+  const [licensesError, setLicensesError] = useState<string | null>(null);
+
+  const loadLicenses = useCallback(() => {
+    setLicensesError(null);
+    setLicensesLoading(true);
+    getLicensesUseCase
+      .execute()
+      .then(setLicensesData)
+      .catch((err) =>
+        setLicensesError(err instanceof Error ? err.message : "Failed to load licenses")
+      )
+      .finally(() => setLicensesLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (activeStep === 6) {
+      loadJobRequirements();
+      loadLicenses();
+    }
+  }, [activeStep, loadJobRequirements, loadLicenses]);
 
   // Step 2 state
   const [searchSkill, setSearchSkill] = useState("");
@@ -136,7 +185,7 @@ export default function CreateJobPage() {
   const [isCustomAmountModalOpen, setIsCustomAmountModalOpen] = useState(false);
   const [customWorkersAmount, setCustomWorkersAmount] = useState("");
 
-  // Step 4 state
+  // Step 4 state (all wage/cost values from Step4LabourCosts)
   const [wage, setWage] = useState<string>("28.00");
   const [siteAllowance, setSiteAllowance] = useState<string>("0.00");
   const [leadingHandAllowance, setLeadingHandAllowance] = useState<string>("0.00");
@@ -158,7 +207,7 @@ export default function CreateJobPage() {
 
   // Step 7 state (job details: requirements, licenses, description)
   const [jobRequirements, setJobRequirements] = useState<string[]>([]);
-  const [licensesText, setLicensesText] = useState("");
+  const [licenses, setLicenses] = useState<string[]>([]);
   const [description, setDescription] = useState("");
 
   // Step 8 state (payment schedule)
@@ -167,6 +216,87 @@ export default function CreateJobPage() {
 
   // Step 9 state (summary)
   const [showJobPublic, setShowJobPublic] = useState(true);
+
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  function formatTimeToHHMMSS(date: Date | null): string {
+    if (!date) return "09:00:00";
+    const h = date.getHours();
+    const m = date.getMinutes();
+    const s = date.getSeconds();
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    return `${pad(h)}:${pad(m)}:${pad(s)}`;
+  }
+
+  function formatDateToISO(date: Date | null): string {
+    if (!date) return new Date().toISOString();
+    return date.toISOString();
+  }
+
+  function buildCreateJobPayload(): CreateJobRequest | null {
+    if (!selectedJobsite || !jobType || !workersAmount || !startDate || !endDate || !paymentSchedule) return null;
+    const manyLabours = parseInt(workersAmount, 10) || 1;
+    const jobSkills: CreateJobRequest["job_skills"] = [];
+    if (selectedSkill && skillsData?.data) {
+      const cat = skillsData.data.find((c) =>
+        c.subcategories.some((sub) => skillDisplayLabel(c.name, sub.name) === selectedSkill)
+      );
+      if (cat) {
+        const sub = cat.subcategories.find((s) => skillDisplayLabel(cat.name, s.name) === selectedSkill);
+        if (sub) jobSkills.push({ skill_category_id: cat.id, skill_subcategory_id: sub.id });
+      }
+    }
+    const paymentDayDate = paymentSchedule === "choose_pay_day" ? payDay : endDate;
+    // pay_type_id: replace with value from GET pay-types when available
+    const payTypeIdBySchedule: Record<string, string> = {
+      weekly: "00000000-0000-0000-0000-000000000001",
+      fortnightly: "00000000-0000-0000-0000-000000000002",
+      choose_pay_day: "00000000-0000-0000-0000-000000000003",
+    };
+    const pay_type_id = payTypeIdBySchedule[paymentSchedule] ?? payTypeIdBySchedule.weekly;
+
+    // Wage/cost values from Step4LabourCosts (same parsing as in that step)
+    const wageHourlyRate = parseFloat(wage) || 0;
+    const gst = wageHourlyRate * 0.10 * 0.10; // 10% of Yakka Service Fee (10% of wage)
+
+    return {
+      jobsite_id: selectedJobsite,
+      job_type_id: jobType,
+      many_labours: manyLabours,
+      ongoing_work: isOngoing,
+      ongoing_frequency: "WEEKLY",
+      wage_site_allowance: parseFloat(siteAllowance) || 0,
+      wage_leading_hand_allowance: parseFloat(leadingHandAllowance) || 0,
+      wage_productivity_allowance: parseFloat(productivityAllowance) || 0,
+      wage_hourly_rate: wageHourlyRate,
+      wage_meal: 0,
+      travel_allowance: parseFloat(travelAllowance) || 0,
+      gst: Math.round(gst * 100) / 100,
+      extras_overtime_rate: parseFloat(overtimeRate) || 0,
+      start_date_work: formatDateToISO(startDate),
+      end_date_work: formatDateToISO(endDate),
+      work_saturday: workSaturdays,
+      work_sunday: workSundays,
+      start_time: formatTimeToHHMMSS(startTime),
+      end_time: formatTimeToHHMMSS(endTime),
+      description: description || "",
+      payment_day: formatDateToISO(paymentDayDate),
+      requires_supervisor_signature: false,
+      supervisor_name: "",
+      visibility: showJobPublic ? "PUBLIC" : "PRIVATE",
+      pay_type_id,
+      license_ids: licenses,
+      asap: false,
+      job_skills: jobSkills,
+      job_requirement_ids: jobRequirements,
+      qualification_ids: [],
+      pack_files: [],
+      closing_date: formatDateToISO(endDate),
+      behalf_company: true,
+      location_without_company: null,
+    };
+  }
 
   const handleClose = () => {
     router.push("/dashboard/jobs");
@@ -190,32 +320,20 @@ export default function CreateJobPage() {
     } else if (activeStep === 7) {
       setActiveStep(8);
     } else if (activeStep === 8) {
-      console.log("Submit job:", {
-        jobsite: selectedJobsite,
-        skill: selectedSkill,
-        workers: workersAmount,
-        wage,
-        siteAllowance,
-        leadingHandAllowance,
-        productivityAllowance,
-        overtimeRate,
-        travelAllowance,
-        startDate,
-        endDate,
-        isOngoing,
-        workSaturdays,
-        workSundays,
-        startTime,
-        endTime,
-        jobType,
-        jobRequirements,
-        licensesText,
-        description,
-        paymentSchedule,
-        payDay: paymentSchedule === "choose_pay_day" ? payDay : undefined,
-        showJobPublic,
-      });
-      // TODO: call API to create job, then router.push("/dashboard/jobs")
+      const payload = buildCreateJobPayload();
+      if (!payload) {
+        setSubmitError("Missing required fields.");
+        return;
+      }
+      setSubmitError(null);
+      setSubmitLoading(true);
+      createJobUseCase
+        .execute(payload)
+        .then(() => router.push("/dashboard/jobs"))
+        .catch((err) =>
+          setSubmitError(err instanceof Error ? err.message : "Failed to create job")
+        )
+        .finally(() => setSubmitLoading(false));
     }
   };
 
@@ -225,15 +343,15 @@ export default function CreateJobPage() {
     }
   };
 
-  const filteredSkills = MOCK_SKILLS.filter((skill) =>
-    skill.toLowerCase().includes(searchSkill.toLowerCase()),
-  );
-
   const renderStepContent = () => {
     if (activeStep === 0) {
       return (
         <Step1Jobsites
-          jobsites={MOCK_JOBSITES}
+          company={jobsitesData?.company ?? null}
+          jobsites={jobsitesData?.jobsites ?? []}
+          loading={jobsitesLoading}
+          error={jobsitesError}
+          onRetry={loadJobsites}
           selectedJobsite={selectedJobsite}
           setSelectedJobsite={setSelectedJobsite}
           onOpenCreateModal={() => setIsCreateModalOpen(true)}
@@ -245,9 +363,12 @@ export default function CreateJobPage() {
     if (activeStep === 1) {
       return (
         <Step2Skills
+          skills={skillsData?.data ?? []}
+          loading={skillsLoading}
+          error={skillsError}
+          onRetry={loadSkills}
           searchSkill={searchSkill}
           setSearchSkill={setSearchSkill}
-          filteredSkills={filteredSkills}
           selectedSkill={selectedSkill}
           setSelectedSkill={setSelectedSkill}
           onBack={handleBack}
@@ -311,6 +432,10 @@ export default function CreateJobPage() {
     if (activeStep === 5) {
       return (
         <Step6TimeAndJobType
+          jobTypes={jobTypesData?.types ?? []}
+          loading={jobTypesLoading}
+          error={jobTypesError}
+          onRetry={loadJobTypes}
           onBack={handleBack}
           onNext={handleNext}
           startTime={startTime}
@@ -328,10 +453,18 @@ export default function CreateJobPage() {
         <Step7JobDetails
           onBack={handleBack}
           onNext={handleNext}
+          requirements={jobRequirementsData?.requirements ?? []}
+          licensesList={licensesData?.data ?? []}
+          loading={jobRequirementsLoading || licensesLoading}
+          error={jobRequirementsError || licensesError}
+          onRetry={() => {
+            loadJobRequirements();
+            loadLicenses();
+          }}
           jobRequirements={jobRequirements}
           setJobRequirements={setJobRequirements}
-          licensesText={licensesText}
-          setLicensesText={setLicensesText}
+          licenses={licenses}
+          setLicenses={setLicenses}
           description={description}
           setDescription={setDescription}
         />
@@ -352,8 +485,8 @@ export default function CreateJobPage() {
     }
 
     if (activeStep === 8) {
-      const jobsiteName =
-        MOCK_JOBSITES.find((j) => j.id === selectedJobsite)?.name ?? selectedJobsite ?? "—";
+      const jobsite = jobsitesData?.jobsites.find((j) => j.id === selectedJobsite);
+      const jobsiteName = (jobsite?.address || jobsite?.description || selectedJobsite) ?? "—";
       return (
         <Step9JobSummary
           onBack={handleBack}
@@ -375,6 +508,8 @@ export default function CreateJobPage() {
           onEditTime={() => setActiveStep(5)}
           onEditPayment={() => setActiveStep(7)}
           onEditDescription={() => setActiveStep(6)}
+          submitLoading={submitLoading}
+          submitError={submitError}
         />
       );
     }
@@ -480,6 +615,7 @@ export default function CreateJobPage() {
       <CreateJobsiteModal
         open={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={loadJobsites}
       />
 
       {/* Custom Workers Amount Modal */}

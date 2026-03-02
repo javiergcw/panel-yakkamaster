@@ -1,0 +1,1 @@
+export { GetCompaniesUseCase } from './GetCompaniesUseCase';

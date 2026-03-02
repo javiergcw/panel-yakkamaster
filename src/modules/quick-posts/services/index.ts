@@ -1,0 +1,1 @@
+export { QuickPostsService } from './QuickPostsService';

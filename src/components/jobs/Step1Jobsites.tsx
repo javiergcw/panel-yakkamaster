@@ -1,19 +1,37 @@
 'use client';
 
-import { Box, Typography, Button, Radio, Divider, IconButton } from '@mui/material';
+import { Box, Typography, Button, Radio, Divider, IconButton, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+import BusinessIcon from '@mui/icons-material/Business';
+import type { InstitutionProfileCompany } from '@/modules/institution';
+import type { Jobsite } from '@/modules/institution';
+import { FetchErrorState } from '@/components/FetchErrorState';
 
 interface Step1JobsitesProps {
-    jobsites: any[];
+    company: InstitutionProfileCompany | null;
+    jobsites: Jobsite[];
+    loading: boolean;
+    error: string | null;
+    onRetry: () => void;
     selectedJobsite: string | null;
     setSelectedJobsite: (id: string) => void;
     onOpenCreateModal: () => void;
     onNext: () => void;
 }
 
+function jobsiteLocation(site: Jobsite): string {
+    const parts = [site.city, site.suburb].filter(Boolean);
+    if (parts.length) return parts.join(', ');
+    return site.address;
+}
+
 export default function Step1Jobsites({
+    company,
     jobsites,
+    loading,
+    error,
+    onRetry,
     selectedJobsite,
     setSelectedJobsite,
     onOpenCreateModal,
@@ -118,63 +136,118 @@ export default function Step1Jobsites({
                     flexGrow: 1,
                 }}
             >
-                {jobsites.map((site) => {
-                    const isSelected = selectedJobsite === site.id;
-                    return (
-                        <Box
-                            key={site.id}
-                            onClick={() => setSelectedJobsite(site.id)}
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                p: { xs: 1.5, sm: 2 },
-                                width: '100%',
-                                maxWidth: 600,
-                                border: '1px solid',
-                                borderColor: isSelected ? '#1d1d1f' : '#d1d1d6',
-                                borderRadius: '8px',
-                                cursor: 'pointer',
-                                transition: 'border-color 0.2s',
-                                '&:hover': {
-                                    borderColor: '#1d1d1f',
-                                }
-                            }}
-                        >
-                            <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, gap: 2 }}>
-                                <Radio
-                                    checked={isSelected}
-                                    onChange={() => setSelectedJobsite(site.id)}
-                                    value={site.id}
-                                    sx={{
-                                        color: '#d1d1d6',
-                                        '&.Mui-checked': {
-                                            color: '#1d1d1f',
-                                        },
-                                        p: 0
-                                    }}
-                                />
-                                <Box sx={{ minWidth: 0 }}>
-                                    <Typography sx={{ fontWeight: 600, color: '#1d1d1f', fontSize: { xs: '1rem', sm: '1.1rem' }, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                        {site.name}
-                                    </Typography>
-                                    <Typography sx={{ color: '#555555', fontSize: { xs: '0.8125rem', sm: '0.9rem' }, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                        {site.location}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                            <IconButton
-                                size="small"
-                                sx={{ color: '#1d1d1f', '&:hover': { bgcolor: '#f5f5f7' } }}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    // Handle edit edit action
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+                        <CircularProgress sx={{ color: '#66bb6a' }} />
+                    </Box>
+                ) : error ? (
+                    <FetchErrorState message={error} onRetry={onRetry} />
+                ) : (
+                    <>
+                        {company && (
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1.5,
+                                    width: '100%',
+                                    maxWidth: 600,
+                                    mb: 1,
                                 }}
                             >
-                                <EditIcon fontSize="small" />
-                            </IconButton>
-                        </Box>
-                    );
-                })}
+                                <BusinessIcon sx={{ color: '#86868b', fontSize: '1.25rem' }} />
+                                <Typography
+                                    sx={{
+                                        fontWeight: 600,
+                                        color: '#1d1d1f',
+                                        fontSize: { xs: '1rem', sm: '1.1rem' },
+                                    }}
+                                >
+                                    {company.name}
+                                </Typography>
+                            </Box>
+                        )}
+                        {jobsites.length === 0 ? (
+                            <Typography sx={{ color: '#86868b', fontSize: '0.9375rem' }}>
+                                No jobsites available. Create one to continue.
+                            </Typography>
+                        ) : (
+                            jobsites.map((site) => {
+                                const isSelected = selectedJobsite === site.id;
+                                const location = jobsiteLocation(site);
+                                return (
+                                    <Box
+                                        key={site.id}
+                                        onClick={() => setSelectedJobsite(site.id)}
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            p: { xs: 1.5, sm: 2 },
+                                            width: '100%',
+                                            maxWidth: 600,
+                                            border: '1px solid',
+                                            borderColor: isSelected ? '#1d1d1f' : '#d1d1d6',
+                                            borderRadius: '8px',
+                                            cursor: 'pointer',
+                                            transition: 'border-color 0.2s',
+                                            '&:hover': {
+                                                borderColor: '#1d1d1f',
+                                            },
+                                        }}
+                                    >
+                                        <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, gap: 2, minWidth: 0 }}>
+                                            <Radio
+                                                checked={isSelected}
+                                                onChange={() => setSelectedJobsite(site.id)}
+                                                value={site.id}
+                                                sx={{
+                                                    color: '#d1d1d6',
+                                                    '&.Mui-checked': {
+                                                        color: '#1d1d1f',
+                                                    },
+                                                    p: 0,
+                                                }}
+                                            />
+                                            <Box sx={{ minWidth: 0 }}>
+                                                <Typography
+                                                    sx={{
+                                                        fontWeight: 600,
+                                                        color: '#1d1d1f',
+                                                        fontSize: { xs: '1rem', sm: '1.1rem' },
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                    }}
+                                                >
+                                                    {site.address || site.description || 'Jobsite'}
+                                                </Typography>
+                                                <Typography
+                                                    sx={{
+                                                        color: '#555555',
+                                                        fontSize: { xs: '0.8125rem', sm: '0.9rem' },
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                    }}
+                                                >
+                                                    {location || site.description || '—'}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                        <IconButton
+                                            size="small"
+                                            sx={{ color: '#1d1d1f', '&:hover': { bgcolor: '#f5f5f7' } }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                // Handle edit action
+                                            }}
+                                        >
+                                            <EditIcon fontSize="small" />
+                                        </IconButton>
+                                    </Box>
+                                );
+                            })
+                        )}
+                    </>
+                )}
             </Box>
         </Box>
     );

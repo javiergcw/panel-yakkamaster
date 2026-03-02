@@ -7,6 +7,12 @@ import type {
   UpdateVerificationRequest,
   UpdateVerificationResponse,
   OrganizationDetailResponse,
+  InstitutionProfileResponse,
+  UpdateProfileRequest,
+  JobsitesResponse,
+  CreateJobsiteRequest,
+  UpdateJobsiteRequest,
+  Jobsite,
 } from '../models';
 import { httpClient } from '@/services/http';
 import { getAccessToken } from '@/modules/auth';
@@ -15,6 +21,8 @@ const DASHBOARD_PATH = 'api/v1/institution/dashboard';
 const LABOURS_PATH = 'api/v1/institution/labours';
 const BUILDERS_PATH = 'api/v1/institution/builders';
 const ORGANIZATION_PATH = 'api/v1/institution/organization';
+const PROFILE_PATH = 'api/v1/institution/profile';
+const JOBSITES_PATH = 'api/v1/institution/jobsites';
 
 function authHeaders(): Record<string, string> {
   const token = getAccessToken();
@@ -28,6 +36,52 @@ function authHeaders(): Record<string, string> {
 export class InstitutionDashboardService {
   async getDashboard(): Promise<InstitutionDashboardResponse> {
     return httpClient.get<InstitutionDashboardResponse>(DASHBOARD_PATH, {
+      headers: authHeaders(),
+    });
+  }
+
+  async getProfile(): Promise<InstitutionProfileResponse> {
+    return httpClient.get<InstitutionProfileResponse>(PROFILE_PATH, {
+      headers: authHeaders(),
+    });
+  }
+
+  /**
+   * PUT /api/v1/institution/profile
+   * Body: { company_id: string }
+   */
+  async updateProfile(body: UpdateProfileRequest): Promise<InstitutionProfileResponse> {
+    return httpClient.put<InstitutionProfileResponse>(PROFILE_PATH, body, {
+      headers: authHeaders(),
+    });
+  }
+
+  /**
+   * GET /api/v1/institution/jobsites
+   * Returns company and its jobsites.
+   */
+  async getJobsites(): Promise<JobsitesResponse> {
+    return httpClient.get<JobsitesResponse>(JOBSITES_PATH, {
+      headers: authHeaders(),
+    });
+  }
+
+  /**
+   * POST /api/v1/institution/jobsites
+   * Body: CreateJobsiteRequest
+   */
+  async createJobsite(body: CreateJobsiteRequest): Promise<Jobsite> {
+    return httpClient.post<Jobsite>(JOBSITES_PATH, body, {
+      headers: authHeaders(),
+    });
+  }
+
+  /**
+   * PUT /api/v1/institution/jobsites/:id_jobsite
+   * Body: UpdateJobsiteRequest
+   */
+  async updateJobsite(idJobsite: string, body: UpdateJobsiteRequest): Promise<Jobsite> {
+    return httpClient.put<Jobsite>(`${JOBSITES_PATH}/${idJobsite}`, body, {
       headers: authHeaders(),
     });
   }

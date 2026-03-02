@@ -38,7 +38,7 @@ export default function Step4LabourCosts({
     setTravelAllowance,
 }: Step4LabourCostsProps) {
 
-    // Calculations
+    // Calculations (same logic used when building create-job payload)
     const numWage = parseFloat(wage) || 0;
     const numSite = parseFloat(siteAllowance) || 0;
     const numLeading = parseFloat(leadingHandAllowance) || 0;

@@ -138,7 +138,7 @@ function JobCard({ job }: { job: Job }) {
 
             <CardActions sx={{ px: 3, py: 1.5, justifyContent: 'space-between', bgcolor: '#fafafa', borderTop: '1px solid #f5f5f7' }}>
                 <Box>
-                    <Tooltip title="Ver detalle">
+                    <Tooltip title="View detail">
                         <span>
                             <IconButton
                                 size="small"
@@ -153,21 +153,19 @@ function JobCard({ job }: { job: Job }) {
                             </IconButton>
                         </span>
                     </Tooltip>
-                    <Tooltip title="Editar">
-                        <span>
-                            <IconButton
-                                size="small"
-                                disabled
-                                sx={{
-                                    color: '#86868b',
-                                    '&:hover': { bgcolor: '#eeeeee' },
-                                    '&.Mui-disabled': { color: '#bdbdbd' },
-                                    ml: 0.5,
-                                }}
-                            >
-                                <EditIcon fontSize="small" />
-                            </IconButton>
-                        </span>
+                    <Tooltip title="Edit">
+                        <IconButton
+                            component={Link}
+                            href={`/dashboard/jobs/${job.id}/edit`}
+                            size="small"
+                            sx={{
+                                color: '#86868b',
+                                '&:hover': { bgcolor: '#eeeeee' },
+                                ml: 0.5,
+                            }}
+                        >
+                            <EditIcon fontSize="small" />
+                        </IconButton>
                     </Tooltip>
                 </Box>
                 <Button

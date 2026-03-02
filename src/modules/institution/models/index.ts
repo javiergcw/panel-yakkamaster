@@ -20,6 +20,10 @@ export type {
   UpdateVerificationRequest,
   UpdateVerificationResponse,
   OrganizationDetailResponse,
+  InstitutionProfileUser,
+  InstitutionProfileCompany,
+  InstitutionProfileResponse,
+  UpdateProfileRequest,
 } from './InstitutionDetail';
 export type {
   Job,
@@ -27,3 +31,4 @@ export type {
   JobSkill,
   JobsResponse,
 } from './InstitutionJobs';
+export type { Jobsite, JobsitesResponse, CreateJobsiteRequest, UpdateJobsiteRequest } from './InstitutionJobsites';

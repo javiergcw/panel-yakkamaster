@@ -138,3 +138,41 @@ export interface OrganizationDetailResponse {
   created_at: string;
   updated_at: string;
 }
+
+/**
+ * Institution profile: GET /api/v1/institution/profile
+ */
+export interface InstitutionProfileUser {
+  id: string;
+  email: string;
+  status: string;
+  role: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Company object when present in institution profile response */
+export interface InstitutionProfileCompany {
+  id: string;
+  name: string;
+  description: string | null;
+  website: string | null;
+  security_code?: string;
+}
+
+export interface InstitutionProfileResponse {
+  user: InstitutionProfileUser;
+  id: string;
+  user_id: string;
+  organization_id: string;
+  organization_name: string;
+  company_id: string | null;
+  company: InstitutionProfileCompany | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Body for PUT /api/v1/institution/profile (assign company) */
+export interface UpdateProfileRequest {
+  company_id: string;
+}

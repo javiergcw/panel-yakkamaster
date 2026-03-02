@@ -7,6 +7,9 @@ import PeopleIcon from '@mui/icons-material/People';
 import GroupIcon from '@mui/icons-material/Group';
 import BusinessIcon from '@mui/icons-material/Business';
 import WorkIcon from '@mui/icons-material/Work';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import ArticleIcon from '@mui/icons-material/Article';
+import PersonIcon from '@mui/icons-material/Person';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { usePathname, useRouter } from 'next/navigation';
@@ -18,8 +21,11 @@ const menuItems = [
   { text: 'Dashboard', icon: DashboardIcon, path: '/dashboard' },
   { text: 'Users', icon: GroupIcon, path: '/dashboard/users' },
   { text: 'Organization', icon: BusinessIcon, path: '/dashboard/organization' },
+  { text: 'Profile', icon: PersonIcon, path: '/dashboard/profile' },
   { text: 'Clients', icon: PeopleIcon, path: '/dashboard/client' },
   { text: 'Jobs', icon: WorkIcon, path: '/dashboard/jobs' },
+  { text: 'Jobsites', icon: LocationOnIcon, path: '/dashboard/jobsites' },
+  { text: 'Quick Post', icon: ArticleIcon, path: '/dashboard/quick-post' },
 ];
 
 export default function DashboardLayout({
@@ -67,7 +73,7 @@ export default function DashboardLayout({
       <List sx={{ px: 2, py: 3, flexGrow: 1 }}>
         {menuItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.path || (item.path !== '/dashboard' && pathname?.startsWith(item.path));
+          const isActive = pathname === item.path || (item.path !== '/dashboard' && pathname?.startsWith(item.path + '/'));
           return (
             <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
               <ListItemButton
