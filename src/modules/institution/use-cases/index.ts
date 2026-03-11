@@ -7,6 +7,7 @@ export { GetLabourByIdUseCase } from './GetLabourByIdUseCase';
 export { GetOrganizationUseCase } from './GetOrganizationUseCase';
 export { UpdateOrganizationUseCase } from './UpdateOrganizationUseCase';
 export { UpdateLabourVerificationUseCase } from './UpdateLabourVerificationUseCase';
+export { UpdateLabourProfileUseCase } from './UpdateLabourProfileUseCase';
 export { UpdateBuilderVerificationUseCase } from './UpdateBuilderVerificationUseCase';
 export { UpdateInstitutionProfileUseCase } from './UpdateInstitutionProfileUseCase';
 export { GetJobsitesUseCase } from './GetJobsitesUseCase';

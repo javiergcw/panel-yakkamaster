@@ -13,6 +13,7 @@ import {
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import {
   GetInstitutionDashboardUseCase,
+  GetInstitutionProfileUseCase,
   InstitutionDashboardService,
   type InstitutionDashboardResponse,
   type Labour,
@@ -20,9 +21,11 @@ import {
 } from '@/modules/institution';
 import { FetchErrorState } from '@/components/FetchErrorState';
 
-const getDashboardUseCase = new GetInstitutionDashboardUseCase(
-  new InstitutionDashboardService()
-);
+const service = new InstitutionDashboardService();
+const getDashboardUseCase = new GetInstitutionDashboardUseCase(service);
+const getProfileUseCase = new GetInstitutionProfileUseCase(service);
+
+const ORGANIZATION_NAME_STORAGE_KEY = 'institution_organization_name';
 
 const CHART_COLORS = ['#66bb6a', '#81c784', '#a5d6a7'];
 
@@ -69,6 +72,21 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    getProfileUseCase
+      .execute()
+      .then((profile) => {
+        const name = profile.organization_name?.trim();
+        if (name) {
+          try {
+            localStorage.setItem(ORGANIZATION_NAME_STORAGE_KEY, name);
+          } catch {
+            // ignore storage errors
+          }
+        }
+      })
+      .catch(() => {
+        // don't block dashboard if profile fails
+      });
     loadDashboard(setData, setError, setLoading);
   }, []);
 

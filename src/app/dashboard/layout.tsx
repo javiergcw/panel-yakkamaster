@@ -3,7 +3,6 @@
 import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, AppBar, Toolbar, IconButton, Avatar } from '@mui/material';
 import { useState, useEffect } from 'react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import PeopleIcon from '@mui/icons-material/People';
 import GroupIcon from '@mui/icons-material/Group';
 import BusinessIcon from '@mui/icons-material/Business';
 import WorkIcon from '@mui/icons-material/Work';
@@ -14,15 +13,19 @@ import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { usePathname, useRouter } from 'next/navigation';
 import { getUser, clearSession } from '@/modules/auth';
+import { GetInstitutionProfileUseCase, InstitutionDashboardService } from '@/modules/institution';
+
+const ORGANIZATION_NAME_STORAGE_KEY = 'institution_organization_name';
+const service = new InstitutionDashboardService();
+const getProfileUseCase = new GetInstitutionProfileUseCase(service);
 
 const drawerWidth = 280;
 
 const menuItems = [
   { text: 'Dashboard', icon: DashboardIcon, path: '/dashboard' },
-  { text: 'Users', icon: GroupIcon, path: '/dashboard/users' },
+  { text: 'Network', icon: GroupIcon, path: '/dashboard/users' },
   { text: 'Organization', icon: BusinessIcon, path: '/dashboard/organization' },
   { text: 'Profile', icon: PersonIcon, path: '/dashboard/profile' },
-  { text: 'Clients', icon: PeopleIcon, path: '/dashboard/client' },
   { text: 'Jobs', icon: WorkIcon, path: '/dashboard/jobs' },
   { text: 'Jobsites', icon: LocationOnIcon, path: '/dashboard/jobsites' },
   { text: 'Quick Post', icon: ArticleIcon, path: '/dashboard/quick-post' },
@@ -35,11 +38,31 @@ export default function DashboardLayout({
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUserState] = useState<ReturnType<typeof getUser>>(null);
+  const [organizationName, setOrganizationName] = useState<string | null>(null);
   const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
     setUserState(getUser());
+  }, []);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(ORGANIZATION_NAME_STORAGE_KEY);
+    if (stored) setOrganizationName(stored);
+    getProfileUseCase
+      .execute()
+      .then((profile) => {
+        const name = profile.organization_name?.trim();
+        if (name) {
+          setOrganizationName(name);
+          try {
+            localStorage.setItem(ORGANIZATION_NAME_STORAGE_KEY, name);
+          } catch {
+            // ignore
+          }
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const handleDrawerToggle = () => {
@@ -54,19 +77,49 @@ export default function DashboardLayout({
 
   const drawer = (
     <Box sx={{ height: '100%', bgcolor: '#ffffff', display: 'flex', flexDirection: 'column' }}>
-      {/* Logo */}
+      {/* Logo + App name + Organization subtitle */}
       <Box sx={{ p: 4, borderBottom: '1px solid #f5f5f7' }}>
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 300,
-            color: '#1d1d1f',
-            letterSpacing: '-0.5px',
-            fontSize: '1.25rem',
-          }}
-        >
-          Panel Yakka Sporty
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+          <Box
+            component="img"
+            src="/logo/logo.png"
+            alt=""
+            sx={{
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              objectFit: 'cover',
+              flexShrink: 0,
+            }}
+          />
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25, minWidth: 0 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 300,
+                color: '#1d1d1f',
+                letterSpacing: '-0.5px',
+                fontSize: '1.25rem',
+                lineHeight: 1.3,
+              }}
+            >
+              Panel Yakka Sporty
+            </Typography>
+            {organizationName && (
+              <Typography
+                component="span"
+                sx={{
+                  color: '#86868b',
+                  fontSize: '0.75rem',
+                  fontWeight: 400,
+                  lineHeight: 1.3,
+                }}
+              >
+                {organizationName}
+              </Typography>
+            )}
+          </Box>
+        </Box>
       </Box>
 
       {/* Navigation */}

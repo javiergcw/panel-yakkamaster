@@ -24,7 +24,13 @@ export type {
   InstitutionProfileCompany,
   InstitutionProfileResponse,
   UpdateProfileRequest,
+  UpdateLabourProfileRequest,
+  UpdateLabourProfileSkillItem,
+  UpdateLabourProfileSkillReference,
+  UpdateLabourProfileQualificationItem,
+  UpdateLabourProfileLicenseItem,
 } from './InstitutionDetail';
+export { buildUpdateLabourProfilePayload } from './InstitutionDetail';
 export type {
   Job,
   JobLicense,

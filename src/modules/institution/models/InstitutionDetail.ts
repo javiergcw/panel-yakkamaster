@@ -176,3 +176,90 @@ export interface InstitutionProfileResponse {
 export interface UpdateProfileRequest {
   company_id: string;
 }
+
+/**
+ * Request body for updating labour/user profile (PUT).
+ * All fields must be sent; use null for empty values, not omitted.
+ */
+export interface UpdateLabourProfileSkillReference {
+  company_id: string;
+  description?: string | null;
+}
+
+export interface UpdateLabourProfileSkillItem {
+  category_id: string;
+  subcategory_id: string;
+  experience_level_id: string;
+  years_experience: number;
+  is_primary: boolean;
+  references?: UpdateLabourProfileSkillReference[] | null;
+}
+
+export interface UpdateLabourProfileQualificationItem {
+  qualification_id: string;
+  date_obtained?: string | null;
+  expires_at?: string | null;
+  status: string;
+}
+
+export interface UpdateLabourProfileLicenseItem {
+  license_id: string;
+  photo_url?: string | null;
+  issued_at?: string | null;
+  expires_at?: string | null;
+}
+
+export interface UpdateLabourProfileRequest {
+  first_name: string;
+  last_name: string;
+  location: string;
+  bio: string | null;
+  avatar_url: string | null;
+  phone: string;
+  skills: UpdateLabourProfileSkillItem[] | null;
+  qualifications: UpdateLabourProfileQualificationItem[] | null;
+  licenses: UpdateLabourProfileLicenseItem[] | null;
+  latitude: number;
+  longitude: number;
+  organizations: string[] | null;
+}
+
+/**
+ * Builds the full update profile payload. Ensures all keys are sent;
+ * empty strings and empty arrays become null (do not omit fields).
+ */
+export function buildUpdateLabourProfilePayload(
+  data: {
+    first_name?: string;
+    last_name?: string;
+    location?: string;
+    bio?: string | null;
+    avatar_url?: string | null;
+    phone?: string;
+    skills?: UpdateLabourProfileSkillItem[] | null;
+    qualifications?: UpdateLabourProfileQualificationItem[] | null;
+    licenses?: UpdateLabourProfileLicenseItem[] | null;
+    latitude?: number;
+    longitude?: number;
+    organizations?: string[] | null;
+  }
+): UpdateLabourProfileRequest {
+  const emptyStr = (v: string | null | undefined) =>
+    v === undefined || v === null || String(v).trim() === '' ? null : String(v);
+  const emptyArr = <T>(v: T[] | null | undefined): T[] | null =>
+    v === undefined || v === null || v.length === 0 ? null : v;
+  return {
+    first_name: data.first_name ?? '',
+    last_name: data.last_name ?? '',
+    location: data.location ?? '',
+    bio: emptyStr(data.bio),
+    avatar_url: emptyStr(data.avatar_url),
+    phone: data.phone ?? '',
+    skills: emptyArr(data.skills),
+    qualifications: emptyArr(data.qualifications),
+    licenses: emptyArr(data.licenses),
+    latitude: typeof data.latitude === 'number' ? data.latitude : 0,
+    longitude: typeof data.longitude === 'number' ? data.longitude : 0,
+    organizations: emptyArr(data.organizations),
+  };
+}

@@ -6,6 +6,7 @@ import type {
   LabourDetailResponse,
   UpdateVerificationRequest,
   UpdateVerificationResponse,
+  UpdateLabourProfileRequest,
   OrganizationDetailResponse,
   InstitutionProfileResponse,
   UpdateProfileRequest,
@@ -122,6 +123,19 @@ export class InstitutionDashboardService {
 
   async getLabourById(userId: string): Promise<LabourDetailResponse> {
     return httpClient.get<LabourDetailResponse>(`${LABOURS_PATH}/${userId}`, {
+      headers: authHeaders(),
+    });
+  }
+
+  /**
+   * PUT /api/v1/institution/labours/:user_id
+   * Body: UpdateLabourProfileRequest (all fields required; use null for empty).
+   */
+  async updateLabourProfile(
+    userId: string,
+    body: UpdateLabourProfileRequest
+  ): Promise<LabourDetailResponse> {
+    return httpClient.put<LabourDetailResponse>(`${LABOURS_PATH}/${userId}`, body, {
       headers: authHeaders(),
     });
   }
