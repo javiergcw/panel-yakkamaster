@@ -23,10 +23,12 @@ export function FetchErrorState({ message, onRetry, title = 'Something went wron
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: 280,
-        py: 4,
-        px: 2,
+        minHeight: { xs: 240, sm: 280 },
+        py: { xs: 3, sm: 4 },
+        px: { xs: 2, sm: 3 },
         textAlign: 'center',
+        width: '100%',
+        boxSizing: 'border-box',
       }}
     >
       <Typography
@@ -34,8 +36,9 @@ export function FetchErrorState({ message, onRetry, title = 'Something went wron
         sx={{
           fontWeight: 500,
           color: '#1d1d1f',
-          fontSize: '1.125rem',
+          fontSize: { xs: '1rem', sm: '1.125rem' },
           mb: 1,
+          wordBreak: 'break-word',
         }}
       >
         {title}
@@ -43,9 +46,12 @@ export function FetchErrorState({ message, onRetry, title = 'Something went wron
       <Typography
         sx={{
           color: '#86868b',
-          fontSize: '0.9375rem',
+          fontSize: { xs: '0.875rem', sm: '0.9375rem' },
           mb: 3,
           maxWidth: 420,
+          width: '100%',
+          wordBreak: 'break-word',
+          overflowWrap: 'break-word',
         }}
       >
         {message}
@@ -60,6 +66,7 @@ export function FetchErrorState({ message, onRetry, title = 'Something went wron
           borderRadius: '12px',
           textTransform: 'none',
           fontWeight: 500,
+          fontSize: { xs: '0.875rem', sm: '0.9375rem' },
           '&:hover': { bgcolor: '#5cb860' },
         }}
       >

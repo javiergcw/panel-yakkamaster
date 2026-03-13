@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography, Card, Avatar, Chip, Divider, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Box, Typography, Card, Avatar, Chip, Divider, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Skeleton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
@@ -33,7 +33,31 @@ export default function ClientDetailPage() {
   if (clientDetail === undefined) {
     return (
       <Box>
-        <Typography>Loading...</Typography>
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Skeleton variant="rounded" width={100} height={36} sx={{ borderRadius: '8px' }} />
+        </Box>
+        <Card sx={{ bgcolor: '#ffffff', borderRadius: '16px', boxShadow: 'none', border: '1px solid #f5f5f7', mb: 4, p: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3, mb: 4 }}>
+            <Skeleton variant="circular" width={80} height={80} />
+            <Box sx={{ flex: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                <Skeleton variant="text" width={200} height={36} />
+                <Skeleton variant="rounded" width={80} height={28} />
+              </Box>
+              <Skeleton variant="text" width="30%" height={22} sx={{ mb: 0.5 }} />
+              <Skeleton variant="text" width="45%" height={22} />
+            </Box>
+          </Box>
+          <Divider sx={{ my: 3, borderColor: '#f5f5f7' }} />
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 4 }}>
+            {[1, 2, 3, 4].map((i) => (
+              <Box key={i}>
+                <Skeleton variant="text" width={80} height={20} sx={{ mb: 1 }} />
+                <Skeleton variant="text" width="90%" height={24} sx={{ mb: 3 }} />
+              </Box>
+            ))}
+          </Box>
+        </Card>
       </Box>
     );
   }

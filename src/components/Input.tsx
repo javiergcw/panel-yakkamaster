@@ -5,7 +5,10 @@ import { styled } from '@mui/material/styles';
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
-    height: '52px', // Más alto estilo Apple
+    height: 52,
+    [theme.breakpoints.down('sm')]: {
+      height: 48,
+    },
     fontSize: '1rem',
     backgroundColor: '#fafafa',
     borderRadius: '12px', // Más redondeado
@@ -30,6 +33,10 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   },
   '& .MuiInputBase-input': {
     padding: '16px 20px',
+    [theme.breakpoints.down('sm')]: {
+      padding: '14px 16px',
+      fontSize: '16px', // evita zoom en iOS
+    },
     fontSize: '1rem',
     fontWeight: 400,
     '&::placeholder': {

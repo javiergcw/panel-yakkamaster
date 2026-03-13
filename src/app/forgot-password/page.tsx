@@ -113,7 +113,7 @@ export default function ForgotPasswordPage() {
                 mb: 0.5,
               }}
             >
-              Panel Yakka Sporty
+              Panel Yakka Sport
             </Typography>
           </Box>
 
@@ -347,7 +347,7 @@ export default function ForgotPasswordPage() {
               fontSize: '2.5rem',
             }}
           >
-            Panel Yakka Sporty
+            Panel Yakka Sport
           </Typography>
           <Typography
             variant="h6"

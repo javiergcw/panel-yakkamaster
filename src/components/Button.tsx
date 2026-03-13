@@ -4,13 +4,19 @@ import { Button as MuiButton, ButtonProps as MuiButtonProps } from '@mui/materia
 import { styled } from '@mui/material/styles';
 
 const StyledButton = styled(MuiButton)(({ theme }) => ({
-  height: '52px', // Más alto estilo Apple
+  minHeight: 44, // touch target mínimo en móvil
+  height: 52,
   padding: '0 24px',
   fontSize: '1rem',
   fontWeight: 400, // Más ligero
   textTransform: 'none',
   borderRadius: '12px', // Más redondeado
   transition: 'all 0.2s ease',
+  [theme.breakpoints.down('sm')]: {
+    height: 48,
+    padding: '0 20px',
+    fontSize: '0.9375rem',
+  },
   '&.MuiButton-contained': {
     boxShadow: 'none', // Sin sombra
     '&:hover': {

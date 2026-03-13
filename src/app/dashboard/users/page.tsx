@@ -17,7 +17,7 @@ import {
   InputAdornment,
   Tabs,
   Tab,
-  CircularProgress,
+  Skeleton,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useRouter } from 'next/navigation';
@@ -120,8 +120,34 @@ export default function UsersPage() {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 320 }}>
-        <CircularProgress sx={{ color: '#66bb6a' }} />
+      <Box>
+        <Box sx={{ mb: 5, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+          <Box>
+            <Skeleton variant="text" width={120} height={40} sx={{ mb: 1 }} />
+            <Skeleton variant="text" width={200} height={24} />
+          </Box>
+        </Box>
+        <Card sx={{ bgcolor: '#ffffff', borderRadius: '16px', boxShadow: 'none', border: '1px solid #f5f5f7', mb: 4, p: 2 }}>
+          <Skeleton variant="rounded" height={40} sx={{ borderRadius: '12px' }} />
+        </Card>
+        <Card sx={{ bgcolor: '#ffffff', borderRadius: '16px', boxShadow: 'none', border: '1px solid #f5f5f7', overflow: 'hidden' }}>
+          <Box sx={{ px: 2, pt: 2 }}>
+            <Skeleton variant="rounded" width={280} height={48} sx={{ mb: 1 }} />
+          </Box>
+          <Skeleton variant="rectangular" height={52} sx={{ bgcolor: '#fafafa' }} />
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 2, py: 2.5, borderBottom: '1px solid #f5f5f7' }}>
+              <Skeleton variant="circular" width={40} height={40} />
+              <Box sx={{ flex: 1 }}>
+                <Skeleton variant="text" width="30%" height={22} />
+              </Box>
+              <Skeleton variant="text" width="25%" height={20} />
+              <Skeleton variant="rounded" width={72} height={24} />
+              <Skeleton variant="rounded" width={88} height={24} />
+              <Skeleton variant="text" width={70} height={20} />
+            </Box>
+          ))}
+        </Card>
       </Box>
     );
   }

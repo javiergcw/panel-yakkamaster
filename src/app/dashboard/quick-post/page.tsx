@@ -7,7 +7,7 @@ import {
   Card,
   CardContent,
   CardMedia,
-  CircularProgress,
+  Skeleton,
   Chip,
   IconButton,
   Dialog,
@@ -284,8 +284,36 @@ export default function QuickPostPage() {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 320 }}>
-        <CircularProgress sx={{ color: '#66bb6a' }} />
+      <Box>
+        <Box sx={{ mb: 4, display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: 2 }}>
+          <Box>
+            <Skeleton variant="text" width={160} height={40} sx={{ mb: 1 }} />
+            <Skeleton variant="text" width={80} height={24} />
+          </Box>
+          <Skeleton variant="rounded" width={120} height={40} sx={{ borderRadius: '8px' }} />
+        </Box>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 3 }}>
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Card key={i} sx={{ bgcolor: '#ffffff', borderRadius: '16px', boxShadow: 'none', border: '1px solid #f0f0f0', overflow: 'hidden' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, py: 1.5, borderBottom: '1px solid #f5f5f7' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <Skeleton variant="circular" width={40} height={40} />
+                  <Box>
+                    <Skeleton variant="text" width={80} height={20} />
+                    <Skeleton variant="text" width={50} height={16} />
+                  </Box>
+                </Box>
+                <Skeleton variant="rounded" width={60} height={24} />
+              </Box>
+              <Skeleton variant="rectangular" height={200} sx={{ bgcolor: '#f5f5f7' }} />
+              <CardContent sx={{ py: 1.5, px: 2 }}>
+                <Skeleton variant="text" width="100%" height={20} />
+                <Skeleton variant="text" width="85%" height={20} />
+                <Skeleton variant="text" width="70%" height={20} />
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
       </Box>
     );
   }
@@ -405,8 +433,14 @@ export default function QuickPostPage() {
         </DialogTitle>
         <DialogContent sx={{ p: 0 }}>
           {detailLoading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <CircularProgress sx={{ color: '#66bb6a' }} />
+            <Box sx={{ p: 2 }}>
+              <Skeleton variant="rectangular" height={280} sx={{ borderRadius: '8px', mb: 2 }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                <Skeleton variant="rounded" width={80} height={24} />
+              </Box>
+              <Skeleton variant="text" width="100%" height={20} />
+              <Skeleton variant="text" width="90%" height={20} />
+              <Skeleton variant="text" width="70%" height={20} />
             </Box>
           ) : detailPost ? (
             <>

@@ -3,12 +3,13 @@
 import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, AppBar, Toolbar, IconButton, Avatar } from '@mui/material';
 import { useState, useEffect } from 'react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import BarChartIcon from '@mui/icons-material/BarChart';
 import GroupIcon from '@mui/icons-material/Group';
-import BusinessIcon from '@mui/icons-material/Business';
 import WorkIcon from '@mui/icons-material/Work';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ArticleIcon from '@mui/icons-material/Article';
 import PersonIcon from '@mui/icons-material/Person';
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import SchoolIcon from '@mui/icons-material/School';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { usePathname, useRouter } from 'next/navigation';
@@ -23,11 +24,12 @@ const drawerWidth = 280;
 
 const menuItems = [
   { text: 'Dashboard', icon: DashboardIcon, path: '/dashboard' },
+  { text: 'Statistics', icon: BarChartIcon, path: '/dashboard/statistics' },
   { text: 'Network', icon: GroupIcon, path: '/dashboard/users' },
-  { text: 'Organization', icon: BusinessIcon, path: '/dashboard/organization' },
+  { text: 'Applicants', icon: PersonSearchIcon, path: '/dashboard/applicants' },
+  { text: 'Qualifications', icon: SchoolIcon, path: '/dashboard/qualifications' },
   { text: 'Profile', icon: PersonIcon, path: '/dashboard/profile' },
-  { text: 'Jobs', icon: WorkIcon, path: '/dashboard/jobs' },
-  { text: 'Jobsites', icon: LocationOnIcon, path: '/dashboard/jobsites' },
+  { text: 'Post a job', icon: WorkIcon, path: '/dashboard/jobs' },
   { text: 'Quick Post', icon: ArticleIcon, path: '/dashboard/quick-post' },
 ];
 
@@ -103,7 +105,7 @@ export default function DashboardLayout({
                 lineHeight: 1.3,
               }}
             >
-              Panel Yakka Sporty
+              Panel Yakka Sport
             </Typography>
             {organizationName && (
               <Typography
@@ -263,7 +265,7 @@ export default function DashboardLayout({
               letterSpacing: '-0.5px',
             }}
           >
-            Panel Yakka Sporty
+            Panel Yakka Sport
           </Typography>
         </Toolbar>
       </AppBar>
@@ -317,10 +319,13 @@ export default function DashboardLayout({
         component="main"
         sx={{
           flexGrow: 1,
-          p: { xs: 3, sm: 4, md: 5 },
+          p: { xs: 2, sm: 3, md: 4, lg: 5 },
           width: { md: `calc(100% - ${drawerWidth}px)` },
           mt: { xs: 7, md: 0 },
           maxWidth: '100%',
+          minWidth: 0,
+          overflowX: 'hidden',
+          boxSizing: 'border-box',
         }}
       >
         {children}

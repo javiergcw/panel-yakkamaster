@@ -9,7 +9,7 @@ import {
   Chip,
   Divider,
   Button,
-  CircularProgress,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -155,8 +155,48 @@ export default function UserDetailPage() {
   }
   if (state.status === 'loading') {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 320 }}>
-        <CircularProgress sx={{ color: '#66bb6a' }} />
+      <Box>
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Skeleton variant="rounded" width={100} height={36} sx={{ borderRadius: '8px' }} />
+        </Box>
+        <Card sx={{ bgcolor: '#ffffff', borderRadius: '16px', boxShadow: 'none', border: '1px solid #f5f5f7', mb: 4, p: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3, mb: 4, flexWrap: 'wrap' }}>
+            <Skeleton variant="circular" width={80} height={80} />
+            <Box sx={{ flex: 1, minWidth: 200 }}>
+              <Skeleton variant="text" width="50%" height={36} sx={{ mb: 1 }} />
+              <Skeleton variant="text" width="35%" height={22} />
+            </Box>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              <Skeleton variant="rounded" width={100} height={28} />
+              <Skeleton variant="rounded" width={90} height={28} />
+              <Skeleton variant="rounded" width={120} height={28} />
+            </Box>
+          </Box>
+          <Skeleton variant="rounded" width={140} height={32} sx={{ mb: 3 }} />
+          <Divider sx={{ my: 3, borderColor: '#f5f5f7' }} />
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 4 }}>
+            <Box>
+              <Skeleton variant="text" width={50} height={20} sx={{ mb: 1 }} />
+              <Skeleton variant="text" width="70%" height={24} sx={{ mb: 3 }} />
+              <Skeleton variant="text" width={45} height={20} sx={{ mb: 1 }} />
+              <Skeleton variant="text" width="60%" height={24} />
+            </Box>
+          </Box>
+        </Card>
+        <Card sx={{ bgcolor: '#ffffff', borderRadius: '16px', boxShadow: 'none', border: '1px solid #f5f5f7', overflow: 'hidden' }}>
+          <Box sx={{ p: 4, borderBottom: '1px solid #f5f5f7' }}>
+            <Skeleton variant="text" width={140} height={28} />
+          </Box>
+          <Skeleton variant="rectangular" height={52} sx={{ bgcolor: '#fafafa' }} />
+          {[1, 2, 3].map((i) => (
+            <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 2, px: 2, py: 2.5, borderBottom: '1px solid #f5f5f7' }}>
+              <Skeleton variant="text" width="25%" height={22} />
+              <Skeleton variant="text" width="35%" height={20} />
+              <Skeleton variant="text" width="20%" height={20} />
+              <Skeleton variant="rounded" width={60} height={24} />
+            </Box>
+          ))}
+        </Card>
       </Box>
     );
   }

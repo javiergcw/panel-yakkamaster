@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Box, Container, Typography, Link as MuiLink, Alert } from '@mui/material';
 import { Input, Button } from '@/components';
@@ -74,8 +75,25 @@ export default function Home() {
             alignItems: 'center',
           }}
         >
-          {/* Logo - Simple y centrado */}
-          <Box sx={{ mb: 6, textAlign: 'center' }}>
+          {/* Logo + nombre - centrado */}
+          <Box sx={{ mb: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+            <Box
+              sx={{
+                width: 72,
+                height: 72,
+                borderRadius: '50%',
+                overflow: 'hidden',
+                flexShrink: 0,
+              }}
+            >
+              <Image
+                src="/logo/logo.png"
+                alt="Logo Yakka Sport"
+                width={72}
+                height={72}
+                style={{ objectFit: 'cover' }}
+              />
+            </Box>
             <Typography 
               variant="h4" 
               sx={{ 
@@ -86,7 +104,7 @@ export default function Home() {
                 mb: 0.5,
               }}
             >
-              Panel Yakka Sporty
+              Panel Yakka Sport
             </Typography>
           </Box>
 
@@ -247,17 +265,35 @@ export default function Home() {
             maxWidth: 400,
           }}
         >
-          <Typography 
-            variant="h3" 
-            sx={{ 
-              fontWeight: 300, 
-              mb: 2, 
-              letterSpacing: '-1px',
-              fontSize: '2.5rem',
-            }}
-          >
-            Panel Yakka Sporty
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+            <Box
+              sx={{
+                width: 88,
+                height: 88,
+                borderRadius: '50%',
+                overflow: 'hidden',
+                flexShrink: 0,
+              }}
+            >
+              <Image
+                src="/logo/logo.png"
+                alt="Logo Yakka Sport"
+                width={88}
+                height={88}
+                style={{ objectFit: 'cover' }}
+              />
+            </Box>
+            <Typography 
+              variant="h3" 
+              sx={{ 
+                fontWeight: 300, 
+                letterSpacing: '-1px',
+                fontSize: '2.5rem',
+              }}
+            >
+              Panel Yakka Sport
+            </Typography>
+          </Box>
           <Typography 
             variant="h6" 
             sx={{ 
